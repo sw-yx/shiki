@@ -4,7 +4,7 @@ import * as path from 'path'
 import { IRawTheme, Registry } from 'vscode-textmate'
 
 import * as plist from './plist'
-import { Resolver } from './resolver'
+import { SyncResolver } from './resolver'
 
 const THEMES_TEST_PATH = path.resolve(__dirname, '../data/themes')
 
@@ -35,7 +35,7 @@ export class ThemeInfo {
     return plist.parse(fileContents)
   }
 
-  public create(resolver: Resolver): ThemeData {
+  public create(resolver: SyncResolver): ThemeData {
     let theme: IRawTheme = ThemeInfo._loadThemeFile(this._filename)
     if (this._includeFilename) {
       let includeTheme: IRawTheme = ThemeInfo._loadThemeFile(this._includeFilename)

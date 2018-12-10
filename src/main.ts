@@ -2,7 +2,7 @@ import * as fs from 'fs'
 import * as path from 'path'
 
 import { ThemeInfo } from './themes'
-import { IGrammarRegistration, ILanguageRegistration, Resolver } from './resolver'
+import { IGrammarRegistration, ILanguageRegistration, SyncResolver } from './resolver'
 import { getOnigasm } from './onigLibs'
 import { IEmbeddedLanguagesMap, IGrammar } from 'vscode-textmate'
 import { IThemedToken } from './themedTokenizer'
@@ -59,7 +59,7 @@ let _languages: ILanguageRegistration[] = JSON.parse(
   fs.readFileSync(path.join(DATA_PATH, 'languages.json')).toString('utf8')
 )
 
-let OnigasmResolver = new Resolver(_grammars, _languages, getOnigasm(), 'onigasm')
+let OnigasmResolver = new SyncResolver(_grammars, _languages, getOnigasm(), 'onigasm')
 let _themeDatas = THEMES.map(theme => theme.create(OnigasmResolver))
 
 export async function getCodeTokenizer(themeName: string): Promise<(code: string, lang: string) => IThemedToken[][]> {

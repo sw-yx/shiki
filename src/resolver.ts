@@ -3,7 +3,7 @@
  *--------------------------------------------------------*/
 'use strict';
 
-import { IRawGrammar, IOnigLib, parseRawGrammar, RegistryOptions, Thenable } from 'vscode-textmate';
+import { IRawGrammar, IOnigLib, parseRawGrammar, RegistryOptions, Thenable, IRawTheme } from 'vscode-textmate';
 
 import * as path from 'path';
 import * as fs from 'fs';
@@ -20,10 +20,20 @@ export interface IGrammarRegistration {
 	scopeName: string;
 	path: string;
 	embeddedLanguages: { [scopeName: string]: string; };
-	grammar?: Thenable<IRawGrammar>;
+	grammar?: IRawGrammar;
 }
 
-export class Resolver implements RegistryOptions {
+export interface SyncRegistryOptions {
+	theme?: IRawTheme;
+	loadGrammar(scopeName: string): IRawGrammar | undefined | null;
+	getInjections?(scopeName: string): string[];
+	getOnigLib?(): Thenable<IOnigLib>;
+}
+
+/**
+ * A synchronous resolver
+ */
+export class SyncResolver implements SyncRegistryOptions {
 	public readonly language2id: { [languages: string]: number; };
 	private _lastLanguageId: number;
 	private _id2language: string[];
@@ -120,12 +130,12 @@ export class Resolver implements RegistryOptions {
 		throw new Error('Could not findGrammarByLanguage for ' + language);
 	}
 
-	public loadGrammar(scopeName: string): Thenable<IRawGrammar | null> {
+	public loadGrammar(scopeName: string): IRawGrammar | null {
 		for (let i = 0; i < this._grammars.length; i++) {
 			let grammar = this._grammars[i];
 			if (grammar.scopeName === scopeName) {
 				if (!grammar.grammar) {
-					grammar.grammar = readGrammarFromPath(grammar.path);
+					grammar.grammar = readGrammarFromPathSync(grammar.path);
 				}
 				return grammar.grammar;
 			}
@@ -145,4 +155,9 @@ function readGrammarFromPath(path: string) : Thenable<IRawGrammar> {
 			}
 		});
 	});
+}
+
+function readGrammarFromPathSync(path: string) : IRawGrammar {
+	const content = fs.readFileSync(path).toString()
+	return parseRawGrammar(content, path);
 }
