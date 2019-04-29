@@ -5,9 +5,10 @@ import { TLang, commonLangIds, commonLangAliases, ILanguageRegistration, getLang
 import { Resolver } from './resolver'
 import { getOnigasm } from './onigLibs'
 import { tokenizeWithTheme, IThemedToken } from './themedTokenizer'
-import { renderToHtml } from './renderer'
+import { renderToHtml } from './renderer/html'
 
 import { getTheme, TTheme, IShikiTheme } from 'shiki-themes'
+import { renderToSVG } from './renderer/svg';
 
 export interface HighlighterOptions {
   theme: TTheme | IShikiTheme
@@ -81,6 +82,13 @@ class Shiki {
         return renderToHtml(tokens, {
           bg: this._theme.bg
         })
+      },
+      codeToSVG: (code, lang) => {
+        const tokens = tokenizeWithTheme(this._theme, this._colorMap, code, ltog[lang])
+        return renderToSVG(tokens, {
+          bg: this._theme.bg,
+          fontSize: 16
+        })
       }
     }
   }
@@ -89,10 +97,10 @@ class Shiki {
 export interface Highlighter {
   codeToThemedTokens(code: string, lang: string): IThemedToken[][]
   codeToHtml?(code: string, lang: string): string
+  codeToSVG?(code: string, lang: string): string
 
   // codeToRawHtml?(code: string): string
   // getRawCSS?(): string
 
-  // codeToSVG?(): string
   // codeToImage?(): string
 }
