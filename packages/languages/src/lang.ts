@@ -63,6 +63,7 @@ export const commonLangAliases: TCommonLangAlias[] = [
   'zsh',
   'ts',
   'yml',
+  'toml',
   'md',
   /**
    * Extra grammars
@@ -406,7 +407,7 @@ export const languages: ILanguageRegistration[] = [
     id: 'yaml',
     scopeName: 'source.yaml',
     path: '../data/grammars/yaml.json',
-    aliases: ['yml']
+    aliases: ['yml', 'toml']
   },
   /**
    * Extra grammars
